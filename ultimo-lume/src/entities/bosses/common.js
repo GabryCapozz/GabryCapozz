@@ -4,7 +4,7 @@ import { SPR } from '../../gfx/sprites/index.js';
 import { P } from '../../gfx/palette.js';
 import { FX } from '../../systems/particles.js';
 import { Pickup } from '../pickups.js';
-import { rand } from '../../core/math.js';
+import { rand, angleTo } from '../../core/math.js';
 
 // Expanding ground ring that damages whatever it passes through.
 export class Shockwave extends Entity {
@@ -156,6 +156,7 @@ export class Boss extends Actor {
 
   get player() { return this.game.player; }
   distP() { return Math.hypot(this.player.x - this.x, this.player.y - this.y); }
+  angP() { return angleTo(this.x, this.y, this.player.x, this.player.y); }
 
   update() {
     this.tickTimers();
@@ -217,8 +218,9 @@ export class Boss extends Actor {
     g.camera.focus = null;
     g.audio.setIntensity(0);
     g.audio.play('victory');
+    const at = this.rewardAt || { x: this.x, y: this.y };
     rewards.forEach((r, i) => {
-      g.addEntity(new Pickup(g, this.x + (i - (rewards.length - 1) / 2) * 28, this.y, r.item, 1, { persist: r.flag, present: true }));
+      g.addEntity(new Pickup(g, at.x + (i - (rewards.length - 1) / 2) * 28, at.y, r.item, 1, { persist: r.flag, present: true }));
     });
     if (this.gateId) g.room.emit(this.gateId, true, true);
     setTimeout(() => g.audio.playMusic(g.room.def.afterMusic || 'ruins', 2), 3500);

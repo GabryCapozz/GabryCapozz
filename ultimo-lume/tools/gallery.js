@@ -1,5 +1,4 @@
 import { buildHumanoid, LOOKS } from '../src/gfx/sprites/humanoid.js';
-import { font } from '../src/gfx/font.js';
 const S = 4;
 const c = document.getElementById('c');
 c.width = 320; c.height = 225;

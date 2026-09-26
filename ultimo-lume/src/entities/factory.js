@@ -1,5 +1,5 @@
 // Maps legend specs to entity instances.
-import { Breakable, Chest, Sign, Door, Gate, Lever, Plate, PushBlock, Torch, Brazier, CrystalSwitch, Barrier, EyeSwitch, OwlStatue, SymbolTile, Spikes, Boulder, Decor, Warp, Trigger, SealGate } from './props.js';
+import { Breakable, Chest, Sign, Door, Gate, Lever, Plate, PushBlock, Torch, Brazier, CrystalSwitch, Barrier, EyeSwitch, OwlStatue, SymbolTile, Spikes, Boulder, Decor, Warp, Trigger, SealGate, BridgeZone, Shortcut, Mural, Sigil, LumeAltar } from './props.js';
 import { Pickup } from './pickups.js';
 import { NPC } from './npc.js';
 import { Slime } from './enemies/slime.js';
@@ -8,11 +8,19 @@ import { Skeleton } from './enemies/skeleton.js';
 import { Archer } from './enemies/archer.js';
 import { GLOBAL_LEGEND } from '../data/legend.js';
 import { StoneGuardian } from './bosses/stoneGuardian.js';
+import { DeepHorror } from './bosses/deepHorror.js';
+import { CorruptedKnight } from './bosses/knight.js';
+import { Echo } from './bosses/echo.js';
+import { Guardian } from './enemies/guardian.js';
+import { Mage } from './enemies/mage.js';
+import { Beetle } from './enemies/beetle.js';
+import { Wisp } from './enemies/wisp.js';
+import { Turret } from './enemies/turret.js';
 
 export { GLOBAL_LEGEND };
 
 // Types whose adjacent identical map chars merge into a single entity.
-export const GROUPED = new Set(['door', 'gate', 'warp', 'trigger', 'sealGate']);
+export const GROUPED = new Set(['door', 'gate', 'warp', 'trigger', 'sealGate', 'bridgeZone']);
 
 const TYPES = {
   breakable: (g, x, y, o) => new Breakable(g, x, y, o),
@@ -49,6 +57,19 @@ const TYPES = {
   skeleton: (g, x, y, o) => new Skeleton(g, x, y, o),
   archer: (g, x, y, o) => new Archer(g, x, y, o),
   stoneGuardian: (g, x, y, o) => new StoneGuardian(g, x, y, o),
+  deepHorror: (g, x, y, o) => new DeepHorror(g, x, y, o),
+  knight: (g, x, y, o) => new CorruptedKnight(g, x, y, o),
+  echo: (g, x, y, o) => new Echo(g, x, y, o),
+  lumeAltar: (g, x, y, o) => new LumeAltar(g, x, y, o),
+  guardian: (g, x, y, o) => new Guardian(g, x, y, o),
+  mage: (g, x, y, o) => new Mage(g, x, y, o),
+  beetle: (g, x, y, o) => new Beetle(g, x, y, o),
+  wisp: (g, x, y, o) => new Wisp(g, x, y, o),
+  turret: (g, x, y, o) => new Turret(g, x, y, o),
+  bridgeZone: (g, x, y, o) => new BridgeZone(g, x, y, o),
+  shortcut: (g, x, y, o) => new Shortcut(g, x, y, o),
+  mural: (g, x, y, o) => new Mural(g, x, y, o),
+  sigil: (g, x, y, o) => new Sigil(g, x, y, o),
 };
 
 export function registerType(name, fn, enemy = false) {
@@ -56,7 +77,7 @@ export function registerType(name, fn, enemy = false) {
   if (enemy) ENEMY_TYPES.add(name);
 }
 
-export const ENEMY_TYPES = new Set(['slime', 'bat', 'skeleton', 'archer']);
+export const ENEMY_TYPES = new Set(['slime', 'bat', 'skeleton', 'archer', 'guardian', 'mage', 'beetle', 'wisp']);
 
 export function createEntity(game, spec, x, y) {
   const fn = TYPES[spec.type];

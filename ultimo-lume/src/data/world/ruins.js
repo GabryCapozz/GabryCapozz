@@ -95,6 +95,9 @@ export const RUINS = [
   },
   {
     id: 'r_east', name: 'Sala dei Cristalli', region: 'ruins', theme: 'ruins', dungeon: 'ruins', gx: 11, gy: 2, crystal: 'red',
+    place: [
+      { at: [27, 3], type: 'pickup', item: 'page', flag: 'item.page.reast' },
+    ],
     map: [
       topGap,
       topGap,

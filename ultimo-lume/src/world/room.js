@@ -71,6 +71,11 @@ export class Room {
         this.tiles[ty * this.tw + tx] = tile;
       }
     }
+    // extra entities placed by coordinates (collectibles that sit on plain floor)
+    for (const spec of this.def.place || []) {
+      const [tx, ty] = spec.at;
+      this.pending.push({ ch: null, spec, tx, ty, gw: 1, gh: 1 });
+    }
   }
 
   applyPersistentTiles() {

@@ -133,6 +133,26 @@ function paintTile(room, ctx, octx, tx, ty) {
     if (right === T.FLOOR) fr(3, x + 15, y, false);
   }
 
+  // woven trim along carpet edges
+  if (t === T.FLOOR2 && theme.floor2 === 'carpet') {
+    const edge = (n) => n !== T.FLOOR2;
+    ctx.fillStyle = P.ink;
+    if (edge(up)) ctx.fillRect(x, y, 16, 1);
+    if (edge(down)) ctx.fillRect(x, y + 15, 16, 1);
+    if (edge(left)) ctx.fillRect(x, y, 1, 16);
+    if (edge(right)) ctx.fillRect(x + 15, y, 1, 16);
+    ctx.fillStyle = P.gold;
+    if (edge(up)) for (let i = 0; i < 16; i += 2) ctx.fillRect(x + i, y + 2, 1, 1);
+    if (edge(down)) for (let i = 1; i < 16; i += 2) ctx.fillRect(x + i, y + 13, 1, 1);
+    if (edge(left)) for (let i = 0; i < 16; i += 2) ctx.fillRect(x + 2, y + i, 1, 1);
+    if (edge(right)) for (let i = 1; i < 16; i += 2) ctx.fillRect(x + 13, y + i, 1, 1);
+    ctx.fillStyle = P.tan;
+    if (edge(up)) ctx.fillRect(x, y + 1, 16, 1);
+    if (edge(down)) ctx.fillRect(x, y + 14, 16, 1);
+    if (edge(left)) ctx.fillRect(x + 1, y, 1, 16);
+    if (edge(right)) ctx.fillRect(x + 14, y, 1, 16);
+  }
+
   if (t === T.RAIL) {
     const h = room.tileAt(tx - 1, ty) === T.RAIL || room.tileAt(tx + 1, ty) === T.RAIL;
     ctx.drawImage(railTile(h), x, y);

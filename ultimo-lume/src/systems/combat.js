@@ -65,6 +65,8 @@ function canHit(hit, e) {
 
 export function hurtRect(e) {
   const w = e.hurtW ?? e.w, h = e.hurtH ?? e.h;
+  const c = e.hurtCenter;
+  if (c) return { x: c.x, y: c.y - (e.hurtOY || 0), w, h };
   return { x: e.x, y: e.y - (e.hurtOY || 0) - (e.z || 0), w, h };
 }
 

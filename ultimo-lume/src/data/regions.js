@@ -20,7 +20,7 @@ export const REGIONS = {
   mines: {
     name: 'Miniere Dimenticate', sub: 'Il ferro sotto la montagna',
     color: P.brownD, light: P.clay, music: 'mines',
-    dark: 0.9, tint: '#0a0508', ambient: 'embers',
+    dark: 0.8, tint: '#0a0508', ambient: 'embers',
   },
   caves: {
     name: 'Caverne Sotterranee', sub: 'Dove i cristalli bevono la luce',
@@ -35,6 +35,6 @@ export const REGIONS = {
   sanctuary: {
     name: 'Santuario del Lume', sub: 'L\'ultima soglia',
     color: P.steel, light: P.white, music: 'sanctuary',
-    dark: 0.3, tint: '#140c24', ambient: 'motes',
+    dark: 0.5, tint: '#120a26', ambient: 'motes',
   },
 };

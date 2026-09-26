@@ -4,7 +4,7 @@ import { buildSlime, buildBat, buildWisp, buildBeetle, buildArmor, buildTurret }
 import { buildProps } from './props.js';
 import { buildItems } from './items.js';
 import { buildFx } from './fx.js';
-import { buildStoneGuardian } from './bosses.js';
+import { buildStoneGuardian, buildDeepHorror, buildKnight, buildLumeFlame } from './bosses.js';
 
 export const SPR = {};
 
@@ -43,7 +43,7 @@ export function buildSprites(extraBuilders = {}) {
     props: buildProps(),
     items: buildItems(),
     fx: buildFx(),
-    bosses: { stone: buildStoneGuardian() },
+    bosses: { stone: buildStoneGuardian(), deep: buildDeepHorror(), knight: buildKnight(), lume: buildLumeFlame() },
   });
   for (const [k, fn] of Object.entries(extraBuilders)) SPR.bosses[k] = fn();
   return SPR;

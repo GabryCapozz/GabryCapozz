@@ -235,24 +235,24 @@ export const FLOORS = {
     },
   },
   marble: {
-    shadow: P.gray,
+    shadow: P.slate,
     paint(p, rng) {
-      p.rect(0, 0, 16, 16, P.silver);
-      p.hline(0, 15, 16, P.gray); p.vline(15, 0, 16, P.gray);
-      p.hline(0, 0, 15, P.white); p.vline(0, 0, 15, P.white);
+      p.rect(0, 0, 16, 16, '#9aa6be');
+      p.hline(0, 15, 16, P.steel); p.vline(15, 0, 16, P.steel);
+      p.hline(0, 0, 15, '#b3bdd0'); p.vline(0, 0, 15, '#b3bdd0');
       let x = (rng() * 16) | 0, y = 1;
-      while (y < 15) { p.px(x, y, '#aab5c8'); x += rng() < 0.5 ? 1 : -1; y++; if (x < 1 || x > 14) break; }
+      while (y < 15) { p.px(x, y, rng() < 0.7 ? P.gray : P.silver); x += rng() < 0.5 ? 1 : -1; y++; if (x < 1 || x > 14) break; }
     },
   },
   goldmarble: {
-    shadow: P.tan,
+    shadow: P.brownD,
     paint(p) {
-      p.rect(0, 0, 16, 16, P.sand);
-      p.rect(2, 2, 12, 12, P.silver);
-      p.rect(4, 4, 8, 8, P.sand);
+      p.rect(0, 0, 16, 16, '#b7a282');
+      p.rect(2, 2, 12, 12, '#9aa6be');
+      p.rect(4, 4, 8, 8, '#b7a282');
       p.rect(7, 7, 2, 2, P.gold);
-      p.hline(0, 0, 16, P.white); p.vline(0, 0, 16, P.white);
-      p.hline(0, 15, 16, P.tan); p.vline(15, 0, 16, P.tan);
+      p.hline(0, 0, 16, P.sand); p.vline(0, 0, 16, P.sand);
+      p.hline(0, 15, 16, P.clay); p.vline(15, 0, 16, P.clay);
     },
   },
   crackedmarble: {

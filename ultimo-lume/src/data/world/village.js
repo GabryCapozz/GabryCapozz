@@ -61,7 +61,10 @@ export const VILLAGE = [
     legend: {
       H: HOUSES.H,
       J: HOUSES.J,
-      W: { type: 'decor', sprite: 'well', solid: true, w: 28, h: 14, oy: 10, ox: 8, tall: true, under: ';' },
+      W: {
+        type: 'shortcut', style: 'well', id: 'well', flag: 'shortcut.well', to: 'm_shaft', at: 'ladder', exit: 'down', under: ';',
+        lockedText: 'Il pozzo è profondo e buio. Dal fondo sale un\'eco di gocce... e di metallo.',
+      },
       G: { type: 'npc', id: 'ghostBaker' },
       N: { type: 'npc', id: 'brann' },
     },
@@ -127,6 +130,9 @@ export const VILLAGE = [
   },
   {
     id: 'v_fields', name: 'Campi', region: 'village', theme: 'village', gx: 6, gy: 7,
+    place: [
+      { at: [26, 11], type: 'pickup', item: 'page', flag: 'item.page.fields' },
+    ],
     map: [
       'TTTTTTTTTTTTT,,,,TTTTTTTTTTTTT',
       'TTTTTTTTTTTT.,,,,.TTTTTTTTTTTT',

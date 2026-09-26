@@ -43,7 +43,18 @@ export class Screen {
 export function startLoop(step, update, render) {
   let acc = 0;
   let last = performance.now();
+  let errors = 0;
   function frame(now) {
+    requestAnimationFrame(frame);
+    try {
+      tick(now);
+    } catch (e) {
+      // never let a single bad frame freeze the game
+      if (errors++ < 20) console.error(e);
+      acc = 0;
+    }
+  }
+  function tick(now) {
     let dt = (now - last) / 1000;
     last = now;
     if (dt > 0.25) dt = 0.25;
@@ -57,7 +68,6 @@ export function startLoop(step, update, render) {
     }
     if (steps >= 4) acc = 0;
     if (steps > 0) render();
-    requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 }

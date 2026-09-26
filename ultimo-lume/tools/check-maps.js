@@ -77,5 +77,30 @@ for (const r of ROOMS) {
   }
 }
 
+// coordinate placements must sit on open ground inside the room
+const GROUND = new Set(['.', ',', ';', 'w', '=']);
+for (const r of ROOMS) {
+  for (const spec of r.place || []) {
+    const [x, y] = spec.at || [];
+    const ch = charAt(r, x, y);
+    if (!GROUND.has(ch)) err(`${r.id}: placed ${spec.type}${spec.item ? ':' + spec.item : ''} at ${x},${y} is on '${ch}', not open ground`);
+    if (spec.type === 'pickup' && !spec.flag) err(`${r.id}: placed pickup at ${x},${y} needs a persistent flag`);
+  }
+}
+
+// collectible totals must match what the UI announces
+const count = (item) => {
+  let n = 0;
+  for (const r of ROOMS) {
+    for (const [ch, spec] of Object.entries(r.legend || {})) {
+      if (spec.item !== item) continue;
+      for (const row of r.map) for (const c of row) if (c === ch) n++;
+    }
+    for (const spec of r.place || []) if (spec.item === item) n++;
+  }
+  return n;
+};
+console.log(`collectibles in the world: pages ${count('page')}, heart pieces ${count('heartPiece')} (+ rewards from NPCs and shops)`);
+
 console.log(`\n${ROOMS.length} rooms checked: ${errors} errors, ${warnings} warnings`);
 process.exit(errors ? 1 : 0);

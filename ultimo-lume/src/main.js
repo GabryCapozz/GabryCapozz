@@ -9,6 +9,7 @@ import { P } from './gfx/palette.js';
 import { loadSettings } from './systems/save.js';
 import { TitleScene } from './scenes/titleScene.js';
 import { GameScene } from './scenes/gameScene.js';
+import { EndingScene } from './scenes/endingScene.js';
 
 class App {
   constructor(canvas) {
@@ -51,6 +52,10 @@ class App {
 
   toTitle() {
     this.scene = new TitleScene(this);
+  }
+
+  toEnding(progress, choice) {
+    this.scene = new EndingScene(this, progress, choice);
   }
 
   setScene(scene) {

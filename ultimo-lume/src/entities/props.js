@@ -1013,3 +1013,192 @@ export class SealGate extends Prop {
     if (n > 0) out.push({ x: this.x - cx + 8, y: this.y - 8 - cy, r: 20 + n * 10, i: 0.7, color: P.gold });
   }
 }
+
+// ------------------------------------------------------------------ Bridge that appears on a signal (over chasms / lava)
+export class BridgeZone extends Prop {
+  constructor(game, x, y, o) {
+    super(game, x, y, o);
+    this.layer = 'floor';
+  }
+
+  init() {
+    if (this.flags['sig:' + this.o.id]) this.build(true);
+  }
+
+  onSignal(name, on) {
+    if (name === this.o.id && on && !this.built) this.build(false);
+  }
+
+  build(instant) {
+    this.built = true;
+    const tiles = [];
+    for (let j = 0; j < this.gh; j++) for (let i = 0; i < this.gw; i++) tiles.push([this.tx + i, this.ty + j]);
+    if (instant) {
+      for (const [x, y] of tiles) this.room.setTile(x, y, T.BRIDGE);
+      return;
+    }
+    // planks appear one by one
+    tiles.forEach(([x, y], k) => {
+      setTimeout(() => {
+        if (this.game.room !== this.room) return;
+        this.room.setTile(x, y, T.BRIDGE);
+        FX.dust(this.game.particles, x * 16 + 8, y * 16 + 8, 3, P.tan);
+        this.game.audio.play('push', { vol: 0.5 });
+      }, 120 * k);
+    });
+  }
+}
+
+// ------------------------------------------------------------------ Shortcut ladder / well (one-way unlock, then two-way warp)
+export class Shortcut extends Prop {
+  constructor(game, x, y, o) {
+    super(game, x, y, o);
+    this.solid = o.style === 'well';
+    this.interactable = true;
+    this.interactRange = 20;
+    if (o.style === 'well') { this.w = 28; this.h = 14; this.img = SPR.props.well; this.drawOY = 10; this.x += 8; }
+    else { this.w = 16; this.h = 16; }
+  }
+
+  init() {
+    this.open = !!this.flags[this.o.flag];
+    this.prompt = this.open ? (this.o.style === 'well' ? 'Scendi' : 'Sali') : 'Esamina';
+  }
+
+  onInteract() {
+    if (this.open) { this.game.warpTo(this.o.to, this.o.at, this.o.exit || 'down'); return; }
+    if (this.o.unlock) {
+      this.open = true;
+      this.flags[this.o.flag] = true;
+      this.prompt = this.o.style === 'well' ? 'Scendi' : 'Sali';
+      this.game.audio.play('door');
+      this.game.audio.play('secret');
+      this.game.dialog([{ text: this.o.unlockText }]);
+      return;
+    }
+    this.game.dialog([{ text: this.o.lockedText }]);
+  }
+
+  draw(ctx, cx, cy) {
+    if (this.o.style === 'well') return super.draw(ctx, cx, cy);
+    const img = this.open ? SPR.props.ladder : SPR.props.hatch;
+    if (this.open) ctx.drawImage(img, Math.round(this.x - 8 - cx), Math.round(this.y + 8 - img.height - cy));
+    else ctx.drawImage(img, Math.round(this.x - 8 - cx), Math.round(this.y - 8 - cy));
+  }
+}
+
+// ------------------------------------------------------------------ Mural: a wall plaque showing a rune sequence
+export class Mural extends Prop {
+  constructor(game, x, y, o) {
+    super(game, x, y, o);
+    this.interactable = true;
+    this.prompt = 'Osserva';
+    this.layer = 'floor';
+    this.interactRange = 20;
+  }
+
+  onInteract() {
+    this.game.dialog((this.o.text || []).map((text) => ({ text })));
+  }
+
+  draw(ctx, cx, cy) {
+    const n = this.o.glyphs.length;
+    const w = n * 12 + 6, h = 16;
+    const x = Math.round(this.x - w / 2 - cx), y = Math.round(this.y - 24 - cy);
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(x - 1, y - 1, w + 2, h + 2);
+    ctx.fillStyle = P.slate;
+    ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = P.steel;
+    ctx.fillRect(x, y, w, 1);
+    ctx.fillStyle = P.gold;
+    this.o.glyphs.forEach((gi, i) => drawGlyph(ctx, gi, x + 4 + i * 12, y + 4));
+  }
+}
+
+// ------------------------------------------------------------------ Light sigil: awakened only by the Light Blade
+export class Sigil extends Prop {
+  constructor(game, x, y, o) {
+    super(game, x, y, o);
+    this.team = 'neutral';
+    this.hurtbox = true;
+    this.w = 16; this.h = 16;
+    this.hurtW = 18; this.hurtH = 26; this.hurtOY = 8;
+    this.layer = 'floor';
+  }
+
+  init() { this.lit = !!this.flags['sig:' + this.o.target] || !!this.flags['sigil:' + this.room.id + ':' + this.tx]; }
+
+  takeHit(hit) {
+    if (this.lit) return null;
+    if (!hit.flags.light) {
+      if (hit.flags.sword) { this.flash = 6; this.game.audio.play('clank'); return 'block'; }
+      return null;
+    }
+    this.lit = true;
+    this.flags['sigil:' + this.room.id + ':' + this.tx] = true;
+    this.game.audio.play('crystal');
+    FX.sparks(this.game.particles, this.x, this.y - 14, 10, [P.white, P.yellow, P.gold]);
+    const group = this.room.entities.filter((e) => e instanceof Sigil && e.o.group === this.o.group);
+    if (group.every((e) => e.lit)) {
+      this.room.emit(this.o.target, true, true);
+      this.game.audio.play('secret');
+    }
+    return 'hit';
+  }
+
+  update() { this.t++; if (this.flash > 0) this.flash--; }
+
+  draw(ctx, cx, cy) {
+    const x = Math.round(this.x - cx), y = Math.round(this.y - 16 - cy);
+    const pulse = (this.t >> 4) % 2;
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(x - 7, y - 7, 14, 14);
+    ctx.fillStyle = this.lit ? P.gold : this.flash > 0 ? P.white : P.steel;
+    ctx.fillRect(x - 6, y - 6, 12, 12);
+    ctx.fillStyle = this.lit ? P.yellow : pulse ? P.gray : P.slate;
+    drawGlyph(ctx, 4, x - 4, y - 4);
+  }
+
+  lights(out, cx, cy) {
+    out.push({ x: this.x - cx, y: this.y - 16 - cy, r: this.lit ? 44 : 16, i: this.lit ? 1 : 0.5, color: this.lit ? P.gold : P.silver });
+  }
+}
+
+// ------------------------------------------------------------------ The altar of the Lume (final choice)
+export class LumeAltar extends Prop {
+  constructor(game, x, y, o) {
+    super(game, x, y, o);
+    this.solid = true;
+    this.w = 36; this.h = 14;
+    this.img = SPR.props.altar;
+    this.drawOY = 10;
+    this.prompt = 'Avvicinati alla fiamma';
+    this.interactRange = 26;
+    this.promptY = 48;
+  }
+
+  init() { this.interactable = !!this.flags['boss:echo']; }
+
+  update() {
+    this.t++;
+    if (!this.interactable && this.flags['boss:echo']) this.interactable = true;
+    if (this.t % 12 === 0) FX.embers(this.game.particles, this.x + rand(-3, 3), this.y - 26, 1);
+  }
+
+  onInteract() { this.game.runEvent('finale', this); }
+
+  draw(ctx, cx, cy) {
+    super.draw(ctx, cx, cy);
+    const small = !this.flags['boss:echo'];
+    const f = (small ? SPR.props.flameVoid : SPR.props.flameBig)[(this.t >> 3) % 4];
+    const s = small ? 0.6 : 0.8 + Math.sin(this.t * 0.05) * 0.1;
+    const w = f.width * s, h = f.height * s;
+    ctx.drawImage(f, Math.round(this.x - cx - w / 2), Math.round(this.y - cy - 18 - h), Math.round(w), Math.round(h));
+  }
+
+  lights(out, cx, cy) {
+    const on = this.flags['boss:echo'];
+    out.push({ x: this.x - cx, y: this.y - 30 - cy, r: on ? 70 + Math.sin(this.t * 0.07) * 6 : 34, i: on ? 1 : 0.6, color: on ? P.gold : P.purple });
+  }
+}
