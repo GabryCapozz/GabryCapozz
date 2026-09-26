@@ -1,0 +1,17 @@
+{
+  "name": "ultimo-lume",
+  "version": "1.0.0",
+  "description": "Action-adventure 2D in pixel art, ispirato all'era 16-bit.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.js",
+    "build": "node tools/build.js",
+    "check": "node tools/check-maps.js",
+    "test": "node tools/check-maps.js && node tools/smoke-test.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "playwright": "1.56.1"
+  }
+}
