@@ -1,1 +1,1 @@
-Hi, I'm Gabriele, I'm a FiveM developer, everything i develope is mainly for my FiveM server, so it's gonna be all QBox script but i hope people will enjoy my script they are pretty simple but just keep in mind that i just started.
+
